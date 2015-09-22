@@ -1,6 +1,6 @@
 ﻿<Window x:Name="Hangman" x:Class="Hangman.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid x:Name="GameGrid"/>
+        Title="Hangman" Height="360" Width="510" ResizeMode="NoResize">
+    <Grid x:Name="GameGrid" Width="495" Height="320"/>
 </Window>
