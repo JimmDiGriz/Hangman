@@ -25,30 +25,76 @@ namespace Hangman
     public partial class MainWindow : Window
     {
         private Game HangmanGame { get; set; }
+        private List<Button> Buttons { get; set; }
+        private List<Label> Labels { get; set; }
+        private Image StageImage { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
-            InitializeGameField();
+            Labels = new List<Label>();
+            Buttons = new List<Button>();
+            CreateNewGameBtn();
         }
 
         private void NewGameBtnClick(object sender, RoutedEventArgs e)
         {
-            InitializeGameField();
+            /*
+             * Поскольку мне лень писать что-то еще пока что,
+             * то сделаю просто массив с парой слов.
+             */
+
+            string[] words = new string[] { 
+                "word", "test", "language", "default",
+                "world", "ship", "fleet", "blueprint"};
+            InitializeGameField(words[new Random().Next(0, words.Length)]);
         }
 
         private void CharacterBtnClick(object sender, RoutedEventArgs e)
         {
-            int[] temp = HangmanGame.TakeCharacter((char)((Button)sender).Content);
+            int[] temp = HangmanGame.TakeCharacter((sender as Button).Content.ToString()[0]);
 
-            (sender as Button).IsEnabled = false;
+            for (int i = 0; i < temp.Length; i++)
+            { 
+                if (temp[i] == 1)
+                {
+                    Labels[i].Content = HangmanGame.Word[i];
+                }
+            }
+
+            StageImage.Source = HangmanGame.GetStageImage();
+
+            if (Labels.Count(l => l.Content == null) == 0)
+            {
+                FinishGame("You Win!");
+            }
+            else if (HangmanGame.IsGameOver())
+            {
+                FinishGame("You Lose!");
+            }
+            else
+            {
+                (sender as Button).IsEnabled = false;
+            }
         }
 
-        private void InitializeGameField()
+        private void FinishGame(string message)
         {
-            HangmanGame = new Game("test", GameLanguage.En);
+            MessageBox.Show(message);
+            Buttons.ForEach(b => b.IsEnabled = false);
+        }
+
+        private void InitializeGameField(string word)
+        {
+            HangmanGame = new Game(word, GameLanguage.En);
+
+            Labels.Clear();
+            Buttons.Clear();
+            GameGrid.Children.Clear();
 
             CreateImage();
+            StageImage.Source = HangmanGame.GetStageImage();
+
             CreateNewGameBtn();
             CreateCharacterBtns(HangmanGame.Alphabet);
             CreateCharacterLbl(HangmanGame.Lenght);
@@ -60,8 +106,10 @@ namespace Hangman
             Button button = new Button();
             button.VerticalAlignment = VerticalAlignment.Center;
             button.HorizontalAlignment = HorizontalAlignment.Right;
+            button.Width = 150;
+            button.Height = 35;
 
-            button.Name = "NewGameBtn";
+            button.Content = "New Game";
             button.Click += new RoutedEventHandler(NewGameBtnClick);
 
             GameGrid.Children.Add(button);
@@ -69,15 +117,15 @@ namespace Hangman
 
         private void CreateImage()
         {
-            Image image = new Image();
+            StageImage = new Image();
 
-            image.Name = "StageImage";
-            image.VerticalAlignment = VerticalAlignment.Center;
-            image.HorizontalAlignment = HorizontalAlignment.Center;
-            image.Width = 150;
-            image.Height = 150;
+            StageImage.Name = "StageImage";
+            StageImage.VerticalAlignment = VerticalAlignment.Center;
+            StageImage.HorizontalAlignment = HorizontalAlignment.Center;
+            StageImage.Width = 150;
+            StageImage.Height = 150;
 
-            GameGrid.Children.Add(image);
+            GameGrid.Children.Add(StageImage);
         }
 
         private void CreateCharacterLbl(int lenght)
@@ -98,6 +146,8 @@ namespace Hangman
                 label.Name = "Character" + i.ToString();
 
                 label.Margin = new Thickness(i * label.Width, 0d, 0d, 0d);
+
+                Labels.Add(label);
 
                 GameGrid.Children.Add(label);
             }
@@ -128,6 +178,8 @@ namespace Hangman
 
                 button.Margin = new Thickness(count * button.Width, 0, 0, bot);
                 button.Click += new RoutedEventHandler(CharacterBtnClick);
+
+                Buttons.Add(button);
 
                 GameGrid.Children.Add(button);
             }

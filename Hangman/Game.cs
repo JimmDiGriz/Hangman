@@ -9,7 +9,7 @@ namespace Hangman
 {
     class Game
     {
-        private string Word { get; set; }
+        public string Word { get; private set; }
         public int Lenght { get; private set; }
         private int Stage { get; set; }
         public char[] Alphabet { get; private set; }
@@ -46,7 +46,7 @@ namespace Hangman
             return new BitmapImage(
                 new Uri(System.IO.Path.Combine(
                     Environment.CurrentDirectory,
-                    "Images", Stage+".png")));
+                    "Images", Stage + ".png")));
         }
 
         public int[] TakeCharacter(char ch)
@@ -55,7 +55,7 @@ namespace Hangman
 
             for (int i = 0; i < Word.Length; i++)
             {
-                if (Word[i] == ch)
+                if (Word.ToUpper()[i] == ch)
                 {
                     temp[i] = 1;
                 }
@@ -71,6 +71,11 @@ namespace Hangman
             }
 
             return temp;
+        }
+
+        public bool IsGameOver()
+        {
+            return Stage == 9 ? true : false;
         }
     }
 }
